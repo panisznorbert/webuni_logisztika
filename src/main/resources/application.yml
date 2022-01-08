@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: -smart
-
   thymeleaf:
     cache: false
 
@@ -10,11 +7,11 @@ spring:
       date-time: yyyy-MM-dd HH:mm:ss
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/webuni
+    url: jdbc:postgresql://localhost:5432/webuni_logisztika
     username: postgres
     password: postgres
 
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
