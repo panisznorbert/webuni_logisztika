@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import net.bytebuddy.implementation.bind.annotation.Default;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 public class AddressDto {
 
@@ -15,6 +18,7 @@ public class AddressDto {
     @NotNull
     @NotEmpty
     @JsonView(View.BaseData.class)
+    @Size(max = 2)
     private String country;
 
     @NotNull
