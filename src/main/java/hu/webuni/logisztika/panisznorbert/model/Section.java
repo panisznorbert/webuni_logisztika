@@ -1,9 +1,6 @@
 package hu.webuni.logisztika.panisznorbert.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 public class Section{
@@ -18,7 +15,10 @@ public class Section{
     @OneToOne
     private Milestone toMilestone;
 
-    private int number;
+    private Integer number;
+
+    @ManyToOne
+    TransportPlan transportPlan;
 
     public Long getId() {
         return id;
@@ -44,11 +44,21 @@ public class Section{
         this.toMilestone = toMilestone;
     }
 
-    public int getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(Integer number) {
         this.number = number;
     }
+
+    public TransportPlan getTransportPlan() {
+        return transportPlan;
+    }
+
+    public void setTransportPlan(TransportPlan transportPlan) {
+        this.transportPlan = transportPlan;
+    }
+
+
 }

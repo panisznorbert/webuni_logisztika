@@ -9,7 +9,7 @@ public class SectionDto {
 
     private MilestoneDto toMilestone;
 
-    private int number;
+    private Integer number;
 
     public Long getId() {
         return id;

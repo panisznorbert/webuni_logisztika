@@ -1,12 +1,15 @@
 package hu.webuni.logisztika.panisznorbert.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@NamedEntityGraph(name = "TransporPlan.full",
+        attributeNodes = {
+                @NamedAttributeNode(value = "sections", subgraph = "sectionsGraph") },
+
+        subgraphs = { @NamedSubgraph(name = "sectionsGraph", attributeNodes = @NamedAttributeNode("milestone"))
+        })
 public class TransportPlan{
 
     @Id
@@ -15,7 +18,7 @@ public class TransportPlan{
 
     private int expectedRevenue;
 
-    @OneToMany
+    @OneToMany(mappedBy = "transportPlan")
     private List<Section> sections;
 
     public Long getId() {
