@@ -25,6 +25,28 @@ public class Address{
 
     private double longitude;
 
+    public Address(){}
+
+    public Address(String country, String city, String street, String zipCode, String number, double latitude, double longitude) {
+        this.country = country;
+        this.city = city;
+        this.street = street;
+        this.zipCode = zipCode;
+        this.number = number;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public Address(Long id, String country, String city, String street, String zipCode, String number, double latitude, double longitude) {
+        this.id = id;
+        this.country = country;
+        this.city = city;
+        this.street = street;
+        this.zipCode = zipCode;
+        this.number = number;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
     public Long getId() {
         return id;

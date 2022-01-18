@@ -4,12 +4,6 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@NamedEntityGraph(name = "TransporPlan.full",
-        attributeNodes = {
-                @NamedAttributeNode(value = "sections", subgraph = "sectionsGraph") },
-
-        subgraphs = { @NamedSubgraph(name = "sectionsGraph", attributeNodes = @NamedAttributeNode("milestone"))
-        })
 public class TransportPlan{
 
     @Id
@@ -42,6 +36,19 @@ public class TransportPlan{
     }
 
     public void setSections(List<Section> sections) {
+        this.sections = sections;
+    }
+
+    public TransportPlan(){}
+
+    public TransportPlan(int expectedRevenue, List<Section> sections) {
+        this.expectedRevenue = expectedRevenue;
+        this.sections = sections;
+    }
+
+    public TransportPlan(Long id, int expectedRevenue, List<Section> sections) {
+        this.id = id;
+        this.expectedRevenue = expectedRevenue;
         this.sections = sections;
     }
 }

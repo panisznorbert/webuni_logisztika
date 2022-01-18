@@ -16,7 +16,7 @@ spring:
     hibernate:
       ddl-auto: update
 
-logisztika:
+logistic:
   delay:
     delay_30_minutes: 5
     delay_60_minutes: 10

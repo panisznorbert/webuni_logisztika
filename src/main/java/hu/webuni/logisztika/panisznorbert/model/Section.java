@@ -17,8 +17,24 @@ public class Section{
 
     private Integer number;
 
-    @ManyToOne
+    @OneToOne
     TransportPlan transportPlan;
+
+    public Section(){}
+
+    public Section(Milestone fromMilestone, Milestone toMilestone, Integer number) {
+        this.fromMilestone = fromMilestone;
+        this.toMilestone = toMilestone;
+        this.number = number;
+    }
+
+    public Section(Long id, Milestone fromMilestone, Milestone toMilestone, Integer number, TransportPlan transportPlan) {
+        this.id = id;
+        this.fromMilestone = fromMilestone;
+        this.toMilestone = toMilestone;
+        this.number = number;
+        this.transportPlan = transportPlan;
+    }
 
     public Long getId() {
         return id;
@@ -59,6 +75,4 @@ public class Section{
     public void setTransportPlan(TransportPlan transportPlan) {
         this.transportPlan = transportPlan;
     }
-
-
 }

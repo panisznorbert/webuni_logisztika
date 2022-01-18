@@ -3,7 +3,7 @@ package hu.webuni.logisztika.panisznorbert.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix = "logisztika")
+@ConfigurationProperties(prefix = "logistic")
 @Component
 public class DelayConfigProperties {
 

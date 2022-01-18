@@ -37,7 +37,7 @@ public class AddressController {
     @PostMapping
     public Long createAddress(@RequestBody @Valid AddressDto addressDto){
 
-        if (addressDto.getId() == 0){
+        if (addressDto.getId() == null){
             return addressMapper.addressToDto(addressService.save(addressMapper.dtoToAddress(addressDto))).getId();
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
