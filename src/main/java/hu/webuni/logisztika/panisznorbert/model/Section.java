@@ -22,18 +22,18 @@ public class Section{
 
     public Section(){}
 
-    public Section(Milestone fromMilestone, Milestone toMilestone, Integer number) {
-        this.fromMilestone = fromMilestone;
-        this.toMilestone = toMilestone;
-        this.number = number;
-    }
-
-    public Section(Long id, Milestone fromMilestone, Milestone toMilestone, Integer number, TransportPlan transportPlan) {
-        this.id = id;
+    public Section(Milestone fromMilestone, Milestone toMilestone, Integer number, TransportPlan transportPlan) {
         this.fromMilestone = fromMilestone;
         this.toMilestone = toMilestone;
         this.number = number;
         this.transportPlan = transportPlan;
+    }
+
+    public Section(Long id, Milestone fromMilestone, Milestone toMilestone, Integer number) {
+        this.id = id;
+        this.fromMilestone = fromMilestone;
+        this.toMilestone = toMilestone;
+        this.number = number;
     }
 
     public Long getId() {

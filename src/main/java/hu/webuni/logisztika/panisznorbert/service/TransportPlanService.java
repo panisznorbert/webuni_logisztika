@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class TransportPlanService {
@@ -24,7 +25,7 @@ public class TransportPlanService {
     @Autowired
     DelayConfigProperties config;
 
-    public Optional<TransportPlan> findById(Long id){ return transportPlanRepository.findById(id);}
+    public Optional<TransportPlan> findById(long id){ return transportPlanRepository.findById(id);}
 
     @Transactional
     public boolean transportPlanIncludeMilestone(TransportPlan transportPlan, long milestoneId, int delay){
@@ -50,7 +51,7 @@ public class TransportPlanService {
                 milestone.setPlannedTime(milestone.getPlannedTime().plusMinutes(delay));
                 milestoneRepository.save(milestone);
 
-                Section nextSection = transportPlan.getSections().stream().filter(s -> s.getNumber().equals(s.getNumber()+1)).findFirst().orElse(null);
+                Section nextSection = transportPlan.getSections().stream().filter(s -> s.getNumber().equals(section.getNumber()+1)).findFirst().orElse(null);
 
                 if (nextSection != null){
 
@@ -71,11 +72,13 @@ public class TransportPlanService {
         if (delay >= 120){
             transportPlan.setExpectedRevenue(transportPlan.getExpectedRevenue()*(100-config.getDelay().getDelay_120_minutes())/100);
             transportPlanRepository.save(transportPlan);
+            return;
         }
 
         if (delay >= 60){
             transportPlan.setExpectedRevenue(transportPlan.getExpectedRevenue()*(100-config.getDelay().getDelay_60_minutes())/100);
             transportPlanRepository.save(transportPlan);
+            return;
         }
 
         if (delay >= 30){

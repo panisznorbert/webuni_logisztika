@@ -1,20 +1,20 @@
 package hu.webuni.logisztika.panisznorbert.web;
 
-import hu.webuni.logisztika.panisznorbert.model.Address;
-import hu.webuni.logisztika.panisznorbert.model.Milestone;
-import hu.webuni.logisztika.panisznorbert.model.Section;
-import hu.webuni.logisztika.panisznorbert.model.TransportPlan;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import hu.webuni.logisztika.panisznorbert.dto.LoginDto;
+import hu.webuni.logisztika.panisznorbert.model.*;
 import hu.webuni.logisztika.panisznorbert.repository.AddressRepository;
 import hu.webuni.logisztika.panisznorbert.repository.MilestoneRepository;
 import hu.webuni.logisztika.panisznorbert.repository.SectionRepository;
 import hu.webuni.logisztika.panisznorbert.repository.TransportPlanRepository;
-import hu.webuni.logisztika.panisznorbert.service.TransportPlanService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,9 +29,6 @@ public class TransportPlanControllerIT {
     WebTestClient webTestClient;
 
     @Autowired
-    TransportPlanService transportPlanService;
-
-    @Autowired
     TransportPlanRepository transportPlanRepository;
 
     @Autowired
@@ -43,50 +40,211 @@ public class TransportPlanControllerIT {
     @Autowired
     SectionRepository sectionRepository;
 
+    private String jwt;
+
+    private TransportPlan transportPlan1;
+
+    private TransportPlan transportPlan2;
+
     @BeforeEach
     public void init(){
-        transportPlanRepository.deleteAll();
-        sectionRepository.deleteAll();
-        milestoneRepository.deleteAll();
-        addressRepository.deleteAll();
 
-        //TestData1
-        Address address1 = addressRepository.save(new Address("HU", "Budapest", "street1", "1157", "18", 123, 123));
 
-        Milestone milestone1 = milestoneRepository.save(new Milestone(address1, LocalDateTime.now().minusMonths(2)));
-        Milestone milestone2 = milestoneRepository.save(new Milestone(address1, LocalDateTime.now().minusMonths(5)));
-        Milestone milestone3 = milestoneRepository.save(new Milestone(address1, LocalDateTime.now().minusMonths(8)));
-        Milestone milestone4 = milestoneRepository.save(new Milestone(address1, LocalDateTime.now().minusMonths(10)));
+        LoginDto body = new LoginDto();
+        body.setUsername("user2");
+        body.setPassword("pass2");
+        jwt = webTestClient.post()
+                .uri("/api/login")
+                .bodyValue(body)
+                .exchange()
+                .expectBody(String.class)
+                .returnResult()
+                .getResponseBody();
 
-        List<Section> sections1 = new ArrayList<Section>();
+        createTestData1();
+        createTestData2();
 
-        sections1.add(sectionRepository.save(new Section(milestone1, milestone2, 1)));
-        sections1.add(sectionRepository.save(new Section(milestone3, milestone4, 2)));
-
-        transportPlanRepository.save(new TransportPlan(12000, sections1));
-
-        //TestData2
-        Address address2 = addressRepository.save(new Address("HU", "Budapest", "street2", "1157", "22", 123, 123));
-
-        Milestone milestone5 = milestoneRepository.save(new Milestone(address2, LocalDateTime.now().minusMonths(8)));
-        Milestone milestone6= milestoneRepository.save(new Milestone(address2, LocalDateTime.now().minusMonths(10)));
-        Milestone milestone7 = milestoneRepository.save(new Milestone(address2, LocalDateTime.now().minusMonths(11)));
-        Milestone milestone8= milestoneRepository.save(new Milestone(address2, LocalDateTime.now().minusMonths(12)));
-        Milestone milestone9 = milestoneRepository.save(new Milestone(address2, LocalDateTime.now().minusMonths(13)));
-        Milestone milestone10= milestoneRepository.save(new Milestone(address2, LocalDateTime.now().minusMonths(14)));
-
-        List<Section> sections2 = new ArrayList<Section>();
-
-        sections2.add(sectionRepository.save(new Section(milestone5, milestone6, 1)));
-        sections2.add(sectionRepository.save(new Section(milestone7, milestone8, 2)));
-        sections2.add(sectionRepository.save(new Section(milestone9, milestone10, 3)));
-
-        transportPlanRepository.save(new TransportPlan(200000, sections2));
     }
 
+    private void createTestData1(){
+
+        transportPlan1 = saveTransportPlan(12000, null);
+
+        Address address1 = saveAddress("HU", "Budapest", "street1", "1157", "18", 123, 123);
+        Milestone milestone1 = saveMilestone(address1, LocalDateTime.now().plusMonths(2));
+        Milestone milestone2 = saveMilestone(address1, LocalDateTime.now().plusMonths(5));
+        Milestone milestone3 = saveMilestone(address1, LocalDateTime.now().plusMonths(8));
+        Milestone milestone4 = saveMilestone(address1, LocalDateTime.now().plusMonths(10));
+        List<Section> sections = new ArrayList<Section>();
+        sections.add(saveSection(milestone1, milestone2, 1, transportPlan1));
+        sections.add(saveSection(milestone3, milestone4, 2, transportPlan1));
+
+        transportPlan1.setSections(sections);
+
+        transportPlanRepository.save(transportPlan1);
+
+
+    }
+
+    private void createTestData2(){
+
+        transportPlan2 = saveTransportPlan(340000, null);
+
+        Address address1 = saveAddress("HU", "Budapest", "street2", "1137", "9", 234, 456);
+        Milestone milestone1 = saveMilestone(address1, LocalDateTime.now().plusMonths(2));
+        Milestone milestone2 = saveMilestone(address1, LocalDateTime.now().plusMonths(7));
+        Milestone milestone3 = saveMilestone(address1, LocalDateTime.now().plusMonths(5));
+        Milestone milestone4 = saveMilestone(address1, LocalDateTime.now().plusMonths(6));
+        Milestone milestone5 = saveMilestone(address1, LocalDateTime.now().plusMonths(10));
+        Milestone milestone6 = saveMilestone(address1, LocalDateTime.now().plusMonths(11));
+        List<Section> sections = new ArrayList<Section>();
+        sections = new ArrayList<Section>();
+        sections.add(saveSection(milestone1, milestone2, 1, transportPlan2));
+        sections.add(saveSection(milestone3, milestone4, 2, transportPlan2));
+        sections.add(saveSection(milestone5, milestone6, 3, transportPlan2));
+
+        transportPlan2.setSections(sections);
+
+        transportPlanRepository.save(transportPlan2);
+
+    }
+
+    @Transactional
+    private Address saveAddress(String country, String city, String street, String zipCode, String number, double latitude, double longitude){
+        return addressRepository.save(new Address(country, city, street, zipCode, number, latitude, longitude));
+    }
+
+    @Transactional
+    private Milestone saveMilestone(Address address, LocalDateTime plannedTime){
+        return milestoneRepository.save(new Milestone(address, plannedTime));
+    }
+
+    @Transactional
+    private Section saveSection(Milestone fromMilestone, Milestone toMilestone, Integer number, TransportPlan transportPlan){
+        return sectionRepository.save(new Section(fromMilestone, toMilestone, number, transportPlan));
+    }
+
+    @Transactional
+    private TransportPlan saveTransportPlan(int expectedRevenue, List<Section> sections){
+        return transportPlanRepository.save(new TransportPlan(expectedRevenue, sections));
+    }
+
+
+
+    //nemlétező transportPlan - negatív teszt
     @Test
-    void testSetDelay(){
+    void testThatNonExistTransportPlan(){
+
+        DelayProperties delayProperties = new DelayProperties(1L, 2);
+
+        long transportPlanId = 10L;
+
+        startPost(transportPlanId, delayProperties)
+                .expectStatus()
+                .isNotFound();
+
+    }
+
+    //nemlétező mérföldkő - negatív teszt
+    @Test
+    void testThatNonExistMileStone(){
+
+        DelayProperties delayProperties = new DelayProperties(1L, 2);
+
+        long transportPlanId = transportPlan1.getId();
+
+        startPost(transportPlanId, delayProperties)
+                .expectStatus()
+                .isNotFound();
+
+    }
+
+    //a mérföldkő nem része a transportPlan-nek - negatív teszt
+    @Test
+    void testThatMileStoneIsNotPartOfTransportPlan(){
+
+        long milestoneId = transportPlan2.getSections().get(0).getFromMilestone().getId();
+
+        long transportPlanId = transportPlan1.getId();
+
+        DelayProperties delayProperties = new DelayProperties(milestoneId, 2);
+
+        startPost(transportPlanId, delayProperties)
+                .expectStatus()
+                .isBadRequest();
+    }
+
+    //kezdő mérföldkő növelése - pozitív teszt
+    @Test
+    void testThatIncraseFromMilestoneWithDelay(){
+
+        LocalDateTime beforeFromMilestonePlannedTime = transportPlan2.getSections().get(0).getFromMilestone().getPlannedTime().plusMinutes(60);
+        LocalDateTime beforeToMilestonePlannedTime = transportPlan2.getSections().get(0).getToMilestone().getPlannedTime().plusMinutes(60);
+
+        int beforRevenue = transportPlan2.getExpectedRevenue();
+
+        long milestoneId = transportPlan2.getSections().get(0).getFromMilestone().getId();
+
+        DelayProperties delayProperties = new DelayProperties(milestoneId, 60);
+
+        startPost(transportPlan2.getId(), delayProperties)
+                .expectStatus()
+                .isOk();
+
+        Milestone afterFromMilestone = milestoneRepository.findById(transportPlan2.getSections().get(0).getFromMilestone().getId()).get();
+
+        Milestone afterToMilestone = milestoneRepository.findById(transportPlan2.getSections().get(0).getToMilestone().getId()).get();
+
+        assertThat(beforeFromMilestonePlannedTime.withNano(0))
+                .isEqualTo(afterFromMilestone.getPlannedTime().withNano(0));
+
+        assertThat(beforeToMilestonePlannedTime.withNano(0))
+                .isEqualTo(afterToMilestone.getPlannedTime().withNano(0));
+
+        assertThat(beforRevenue*0.9).isEqualTo(transportPlanRepository.findById(transportPlan2.getId()).get().getExpectedRevenue());
+    }
+
+    //végmérföldő növelése - pozitív teszt
+    @Test
+    void testThatIncraseToMilestoneWithDelay(){
 
 
+        LocalDateTime beforeToMilestonePlannedTime = transportPlan2.getSections().get(0).getToMilestone().getPlannedTime().plusMinutes(60);
+        LocalDateTime beforeNextFromMilestonePlannedTime = transportPlan2.getSections().get(1).getFromMilestone().getPlannedTime().plusMinutes(60);
+
+        int beforRevenue = transportPlan2.getExpectedRevenue();
+
+        long milestoneId = transportPlan2.getSections().get(0).getToMilestone().getId();
+
+        DelayProperties delayProperties = new DelayProperties(milestoneId, 60);
+
+        startPost(transportPlan2.getId(), delayProperties)
+                .expectStatus()
+                .isOk();
+
+        Milestone afterToMilestone = milestoneRepository.findById(transportPlan2.getSections().get(0).getToMilestone().getId()).get();
+        Section nextSection = transportPlan2.getSections().stream().filter(s -> s.getNumber().equals(transportPlan2.getSections().get(0).getNumber()+1)).findFirst().orElse(null);
+        Milestone afterNextFromMilestone = milestoneRepository.findById(nextSection.getFromMilestone().getId()).get();
+
+        assertThat(beforeNextFromMilestonePlannedTime.withNano(0))
+                .isEqualTo(afterNextFromMilestone.getPlannedTime().withNano(0));
+
+        assertThat(beforeToMilestonePlannedTime.withNano(0))
+                .isEqualTo(afterToMilestone.getPlannedTime().withNano(0));
+
+        assertThat(beforRevenue*0.9).isEqualTo(transportPlanRepository.findById(transportPlan2.getId()).get().getExpectedRevenue());
+
+    }
+
+    private WebTestClient.ResponseSpec startPost(long transportPlanId, DelayProperties delayProperties) {
+
+        String path = BASE_URI + "/" + transportPlanId + "/delay";
+
+        return webTestClient
+                .post()
+                .uri(path)
+                .headers(headers -> headers.setBearerAuth(jwt))
+                .bodyValue(delayProperties)
+                .exchange();
     }
 }
